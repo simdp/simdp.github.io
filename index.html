@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="simDP can transfer action decoders trained on simulation data to real-world environments.">
+  <meta name="keywords" content="sim-to-real, shared action space, diffusion policy">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>simDP: Sim-to-Real Transfer with Shared Action Spaces</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">simDP: Sim-to-Real Transfer with Shared Action Spaces</h1>
+          <div class="is-size-3 publication-authors">
+            <span class="author-block">
+                Anonymous submission under review
+            </span>
+          </div>
+        </div>
+      </div>
+  </div>
+</section>
+
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+      <div class="hero-body">
+          <img src="./static/images/figure_1.jpg" alt="Overview of simDP" />
+
+          <h5 class="subtitle is-5">
+             simDP transfers skills learned from simulations to real-world robots by sharing both the action space and observation space between simulations and real environments.
+          </h5>
+      </div>
+  </div>
+</section>
+
+
+<section class="section">
+        <div class="container is-max-desktop">
+
+            <div class="column is-centered has-text-centered">
+                <h3 class="title is-3">Sample simDP Rollout Visualizations</h3>
+                <div class="content has-text-justified">
+                    <p>The videos below visualizes the top and end-effector camera views from simDP rollouts on stack three, three piece assembly, and threading tasks. simDP is able to successfully transfer skills learned from simulations to the real world.</p>
+                </div>
+
+                <div class="columns">
+                    <div class="column">
+                        <video controls muted preload playsinline height="100%">
+                            <source src="./static/videos/stack_three.mp4"
+                            type="video/mp4">
+                        </video>
+                        <h3 class="subtitle is-3">Stack Three</h3>
+                    </div>
+
+                    <div class="column">
+                        <video controls muted preload playsinline height="100%">
+                            <source src="./static/videos/three_piece_assembly.mp4"
+                            type="video/mp4">
+                        </video>
+                        <h3 class="subtitle is-3">Three Piece Assembly</h3>
+                    </div>
+
+                    <div class="column">
+                        <video controls muted preload playsinline height="100%">
+                            <source src="./static/videos/threading.mp4"
+                            type="video/mp4">
+                        </video>
+                        <h3 class="subtitle is-3">Threading</h3>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+</section>
+
+<section class="section">
+    <div class="container is-max-desktop">
+        <div class="column is-full-width">
+            <h3 class="title is-3">Idea</h3>
+
+            <div class="content">
+                <p>The goal of simDP is to transfer a DP learned in simulation to a real robot while minimizing the amount of real-world policy retraining. Our approach is based on two design choices.</p>
+                <ul>
+                    <li>Instead of robot-sepcific joint commands, represent each action by the end-effector position, orientation, and gripper state so that actions are valid in both simulation and real-world environments: $$a_t = [p_t, r_t, g_t],$$ where \(p_t \in \mathbb{R}^3\) denotes the Cartesian position of the end effector, \(r_t \in \mathbb{R}^6\) denotes the end-effector orientation represented using a continuous 6D rotation representation, and \(g_t \in \{0,1\}\) denotes the binary gripper state. </li>
+                    <li>Decompose the policy into an observation encoder and an action decoder, and directly transfer the simulation action decoder and train a real observation encoder to map visually different observations to the same latent space.</li>
+                </ul>
+            </div>
+
+            <h3 class="title is-3">Implementation</h3>
+
+            <p>We chose Diffusion Policy as the baseline visuomotor policy for sim-to-real transfer. Given the simulation observation encoder \(f_{\text{sim}}\) and noise prediction network \(\epsilon_\phi\), the simulation stage training objective is: $$\mathcal{L}_{\mathrm{sim}}
+            =
+            \mathbb{E}_{(o_t,a_{t:t+H-1}),\,\epsilon,\,k}
+            \left[
+            \left\|
+            \epsilon-\epsilon_{\phi}\!\left(f_{\mathrm{sim}}(o_t), a_{t:t+H-1}^{(k)}, k\right)
+            \right\|_2^2
+            \right].$$</p>
+            <div class="content">
+                <p>In order to directly transfer the simulation action decoder, the observation encoder must compress the visual information to discard the aesthetic differences between simulations and real-world environments. To achieve this, we force the real observation encoder to produce latent features that are compatible with the simulation action decoder: $$\mathcal{L}_{\mathrm{real}}
+                =
+                \mathbb{E}_{(o_t^{\mathrm{real}},a_{t:t+H-1}^{\mathrm{real}}),\,\epsilon,\,k}
+                \left[
+                \left\|
+                \epsilon-\epsilon_{\phi}^{*}\!\left(f_{\psi}(o_t^{\mathrm{real}}), a_{t:t+H-1}^{(k),\mathrm{real}}, k\right)
+                \right\|_2^2
+                \right],$$ where \(\epsilon_\psi^*\) denotes the frozen simulation-trained action decoder. Here, only the encoder paramters \(\phi\) are updated.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container is-max-desktop">
+        <div class="column is-full-width">
+            <div class="content">
+                <h3 class="title is-3">Experiments</h3>
+                <p>We evaluated simDP on three manipulation tasks from MimicGen: Stack Three, Three Piece Assembly, and Threading. These tasks were selected to cover a range of manipulation difficulty levels.</p>
+
+                <h4 class="title is-4">Real world Results</h4>
+                <img src="./static/images/table_1.jpg" alt="real-world results"/>
+                <p>simDP consistently outperforms both the implicit policies based on generative models and the explicit policies based on the transformer architecture on all tasks</p>
+
+                <h4 class="title is-4">Sim-to-real Transfer Ablations</h4>
+                <img src="./static/images/table_2.jpg" alt="sim-to-real transfer ablations"/>
+                <p>simDP benefits from utilizing the simulation-trained decoder which already captures a strong action-generation prior learned from a large simulation dataset.</p>
+
+                <h4 class="title is-4">Shared Observation Space</h4>
+                <p>The embeddings from the two domains exhibit substantial qualitative overlap in the 2D visualization, suggesting that the adapted real-world encoder produces latent features that are broadly compatible with those of the simulation encoder.</p>
+                <img src="./static/images/figure_2.jpg" alt="t-SNE visualizations of latent embeddings"/>
+
+                <h4 class="title is-4">Data Efficiency</h4>
+                <img src="./static/images/table_3.jpg" alt="data efficiency"/>
+                <p>simDP only needs to adapt the observation interface while preserving the action-generation capability already acquired in simulation.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is licensed under a <a rel="license"
+                                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+          <p>
+          Website source code is based on the <a href="https://nerfies.github.io/">Nerfies</a> project page. If you want to reuse their <a
+              href="https://github.com/nerfies/nerfies.github.io">source code</a>, please credit them appropriately.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
