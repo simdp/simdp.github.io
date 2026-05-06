@@ -150,23 +150,31 @@
 
 <section class="section">
     <div class="container is-max-desktop">
-        <div class="column is-full-width">
-            <div class="content">
+        <div class="columns is-multiline">
+            <div class="column is-full">
                 <h3 class="title is-3">Experiments</h3>
                 <p>We evaluated simDP on three manipulation tasks from MimicGen: Stack Three, Three Piece Assembly, and Threading. These tasks were selected to cover a range of manipulation difficulty levels.</p>
+            </div>
 
+            <div class="column is-full">
                 <h4 class="title is-4">Real world Results</h4>
                 <img src="./static/images/table_1.jpg" alt="real-world results"/>
                 <p>simDP consistently outperforms both the implicit policies based on generative models and the explicit policies based on the transformer architecture on all tasks</p>
+            </div>
 
+            <div class="column is-full">
                 <h4 class="title is-4">Sim-to-real Transfer Ablations</h4>
                 <img src="./static/images/table_2.jpg" alt="sim-to-real transfer ablations"/>
                 <p>simDP benefits from utilizing the simulation-trained decoder which already captures a strong action-generation prior learned from a large simulation dataset.</p>
+            </div>
 
+            <div class="column is-full">
                 <h4 class="title is-4">Shared Observation Space</h4>
                 <p>The embeddings from the two domains exhibit substantial qualitative overlap in the 2D visualization, suggesting that the adapted real-world encoder produces latent features that are broadly compatible with those of the simulation encoder.</p>
                 <img src="./static/images/figure_2.jpg" alt="t-SNE visualizations of latent embeddings"/>
+            </div>
 
+            <div class="column is-full">
                 <h4 class="title is-4">Data Efficiency</h4>
                 <img src="./static/images/table_3.jpg" alt="data efficiency"/>
                 <p>simDP only needs to adapt the observation interface while preserving the action-generation capability already acquired in simulation.</p>
